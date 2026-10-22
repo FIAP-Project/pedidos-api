@@ -116,27 +116,15 @@ Executar: `python -m pytest -v`
 
 **Evidência da execução:**
 
-```
-collecting ... collected 5 items
-tests/test_pedidos.py::test_criar_pedido_retorna_201_com_status_criado PASSED [ 20%]
-tests/test_pedidos.py::test_consultar_pedido_existente_retorna_200 PASSED [ 40%]
-tests/test_pedidos.py::test_consultar_pedido_inexistente_retorna_404 PASSED [ 60%]
-tests/test_pedidos.py::test_criar_pedido_com_valor_invalido_retorna_422 PASSED [ 80%]
-tests/test_pedidos.py::test_request_id_e_propagado_e_aparece_nos_logs PASSED [100%]
-========================= 5 passed, 1 warning in 0.38s =========================
-```
+<img width="1454" height="421" alt="Screenshot 2026-10-21 214342" src="https://github.com/user-attachments/assets/88a72459-51d2-4851-aabb-75e8ef08e968" />
+
 
 ## Logs estruturados
 
 Um objeto JSON por linha em stdout, com `timestamp` (UTC), `level`, `message`, `requestId`, `operation` e, quando aplicável, `orderId`, `method`, `path`, `status` e `durationMs`. O `requestId` vem do header `X-Request-ID` (se enviado) ou é gerado, e é devolvido na resposta.
 
-**Evidência (saída real da aplicação ao executar os exemplos acima):**
+**Evidência:**
 
-```json
-{"timestamp": "2026-10-22T00:24:56.658+00:00", "level": "INFO", "message": "Pedido criado", "requestId": "demo-001", "operation": "criar_pedido", "orderId": "ec23bda0-3c64-4002-80c7-0f1897e774b8"}
-{"timestamp": "2026-10-22T00:24:56.658+00:00", "level": "INFO", "message": "Requisição concluída", "requestId": "demo-001", "operation": "http_request", "method": "POST", "path": "/pedidos", "status": 201, "durationMs": 4.6}
-{"timestamp": "2026-10-22T00:24:56.669+00:00", "level": "INFO", "message": "Pedido consultado", "requestId": "db6b651a-8f07-4a90-8f36-50486cc0d894", "operation": "consultar_pedido", "orderId": "ec23bda0-3c64-4002-80c7-0f1897e774b8"}
-{"timestamp": "2026-10-22T00:24:56.669+00:00", "level": "INFO", "message": "Requisição concluída", "requestId": "db6b651a-8f07-4a90-8f36-50486cc0d894", "operation": "http_request", "method": "GET", "path": "/pedidos/ec23bda0-3c64-4002-80c7-0f1897e774b8", "status": 200, "durationMs": 1.03}
-{"timestamp": "2026-10-22T00:24:56.676+00:00", "level": "WARNING", "message": "Pedido não encontrado", "requestId": "397ba89b-fcc4-4b9f-8aed-8ca806ade720", "operation": "consultar_pedido", "orderId": "999"}
-{"timestamp": "2026-10-22T00:24:56.683+00:00", "level": "WARNING", "message": "Dados inválidos", "requestId": "5ca7ef2b-e635-4dbb-8ece-1dcb2eab9b26", "operation": "validar_requisicao"}
-```
+<img width="1454" height="352" alt="Screenshot 2026-10-21 214247" src="https://github.com/user-attachments/assets/3ec5f389-d0d7-43c3-a093-e24949eb0697" />
+
+
