@@ -1,0 +1,244 @@
+openapi: 3.1.0
+info:
+  title: API de Pedidos
+  description: API REST simples para gerenciamento de pedidos (CP5 - Arquitetura Orientada
+    a Serviço).
+  version: 1.0.0
+paths:
+  /pedidos:
+    post:
+      tags:
+      - Pedidos
+      summary: Cria um pedido
+      description: Cria um novo pedido com status inicial CRIADO e retorna o recurso
+        criado.
+      operationId: criar_pedido_pedidos_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PedidoCreate'
+        required: true
+      responses:
+        '201':
+          description: Pedido criado
+          headers:
+            Location:
+              description: URL do novo pedido
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoResponse'
+        '422':
+          description: Dados inválidos (campo ausente, vazio ou valor <= 0)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErroResponse'
+              example:
+                erro:
+                  codigo: DADOS_INVALIDOS
+                  mensagem: Os dados enviados são inválidos
+                  requestId: 7c9e6679-7425-40de-944b-e07fc1f90ae7
+                  detalhes:
+                  - campo: valor
+                    mensagem: Input should be greater than 0
+        '500':
+          description: Erro interno inesperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErroResponse'
+  /pedidos/{pedido_id}:
+    get:
+      tags:
+      - Pedidos
+      summary: Consulta um pedido pelo identificador
+      operationId: consultar_pedido_pedidos__pedido_id__get
+      parameters:
+      - name: pedido_id
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Pedido Id
+      responses:
+        '200':
+          description: Pedido encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoResponse'
+        '404':
+          description: Pedido inexistente
+          content:
+            application/json:
+              example:
+                erro:
+                  codigo: PEDIDO_NAO_ENCONTRADO
+                  mensagem: Pedido '123' não encontrado
+                  requestId: 7c9e6679-7425-40de-944b-e07fc1f90ae7
+              schema:
+                $ref: '#/components/schemas/ErroResponse'
+        '500':
+          description: Erro interno inesperado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErroResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    ErroDetalhe:
+      properties:
+        campo:
+          type: string
+          title: Campo
+        mensagem:
+          type: string
+          title: Mensagem
+      type: object
+      required:
+      - campo
+      - mensagem
+      title: ErroDetalhe
+    ErroInfo:
+      properties:
+        codigo:
+          type: string
+          title: Codigo
+        mensagem:
+          type: string
+          title: Mensagem
+        requestId:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Requestid
+        detalhes:
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/ErroDetalhe'
+            type: array
+          - type: 'null'
+          title: Detalhes
+      type: object
+      required:
+      - codigo
+      - mensagem
+      title: ErroInfo
+    ErroResponse:
+      properties:
+        erro:
+          $ref: '#/components/schemas/ErroInfo'
+      type: object
+      required:
+      - erro
+      title: ErroResponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    PedidoCreate:
+      properties:
+        cliente:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Cliente
+          description: Nome ou identificação do cliente
+        descricao:
+          type: string
+          maxLength: 500
+          minLength: 1
+          title: Descricao
+          description: Descrição do pedido
+        valor:
+          type: number
+          exclusiveMinimum: 0.0
+          title: Valor
+          description: Valor do pedido (maior que zero)
+      type: object
+      required:
+      - cliente
+      - descricao
+      - valor
+      title: PedidoCreate
+      example:
+        cliente: Maria Silva
+        descricao: Notebook 14 polegadas
+        valor: 3499.9
+    PedidoResponse:
+      properties:
+        id:
+          type: string
+          title: Id
+          description: Identificador único (UUID)
+        cliente:
+          type: string
+          title: Cliente
+        descricao:
+          type: string
+          title: Descricao
+        valor:
+          type: number
+          title: Valor
+        status:
+          $ref: '#/components/schemas/StatusPedido'
+      type: object
+      required:
+      - id
+      - cliente
+      - descricao
+      - valor
+      - status
+      title: PedidoResponse
+      example:
+        cliente: Maria Silva
+        descricao: Notebook 14 polegadas
+        id: 0b8f1c3e-5d7a-4a9e-9c11-7f2a6d4e8b10
+        status: CRIADO
+        valor: 3499.9
+    StatusPedido:
+      type: string
+      enum:
+      - CRIADO
+      title: StatusPedido
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
